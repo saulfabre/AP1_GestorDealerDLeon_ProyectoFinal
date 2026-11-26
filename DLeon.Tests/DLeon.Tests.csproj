@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-    <ProjectReference Include="..\AP1_GestorDealer_ProyectoFinal.csproj" />
+    <ProjectReference Include="..\DLeon.Api\DLeon.Api.csproj" />
   </ItemGroup>
 
 </Project>

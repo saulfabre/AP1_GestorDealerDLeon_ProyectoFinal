@@ -1,6 +1,6 @@
-﻿namespace WebApi.Tests;
+namespace DLeon.Tests;
 
-public class UnitTest1
+public class DLeonTests
 {
     [Fact]
     public void Test1()
