@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore DLeon.sln
       
 # 4) Instala la herramienta de SonarScanner para .NET. Si el secreto
     # SONAR_TOKEN no existe, esta parte se omite para que el pipeline no falle.
@@ -49,14 +49,14 @@ jobs:
     # 7) Compila la solución en modo Release. El flag --no-restore evita que
     # vuelva a restaurar paquetes ya descargados y acelera la ejecución.
     - name: Build solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build DLeon.sln --configuration Release --no-restore
 
     # 8) Ejecuta la suite de pruebas del proyecto. Si alguna prueba falla,
     # el workflow marcará el pipeline como fallido.
     # Además, guardamos los resultados en formato TRX para que GitHub pueda
     # mostrarlos de forma amigable en la interfaz.
     - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity minimal --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
+      run: dotnet test DLeon.sln --configuration Release --no-build --verbosity minimal --logger "trx;LogFileName=test-results.trx" --results-directory TestResults
 
     # 9) Cierra la analítica de SonarCloud para finalizar el análisis y enviar
     # los resultados al proyecto configurado en SonarCloud.
