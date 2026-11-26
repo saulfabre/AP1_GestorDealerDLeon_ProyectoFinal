@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DLeon.Data\DLeon.Data.csproj" />
+    <ProjectReference Include="..\DLeon.Services\DLeon.Services.csproj" />
+  </ItemGroup>
+
+</Project>
