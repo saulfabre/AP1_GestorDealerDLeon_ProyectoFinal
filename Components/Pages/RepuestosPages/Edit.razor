@@ -1,0 +1,175 @@
+@page "/Repuestos/Edit/{RepuestoId:int}"
+
+@rendermode InteractiveServer
+
+@inject NavigationManager Navigation
+@inject RepuestosServices RepuestoService
+
+<PageTitle>Editar Repuesto</PageTitle>
+
+@if (Repuesto != null)
+{
+    <EditForm Model="Repuesto" OnValidSubmit="Editar">
+
+        <DataAnnotationsValidator />
+
+        @*Encabezado de la edición de repuestos*@
+        <div class="container">
+            <div class="card shadow-lg">
+                <div class="card-header d-flex align-items-center" style="height: 50px;">
+                    <h5 class="mb-0">Editar Repuesto</h5>
+                </div>
+
+                @*Formulario para la edición de un repuesto*@
+                <div class="card-body">
+                    <div class="d-flex flex-column gap-2">
+
+                        @*Nombre*@
+                        <label class="form-label mb-0">
+                            <strong>Nombre</strong>
+                        </label>
+                        <InputText class="form-control" @bind-Value="Repuesto.Nombre" placeholder="Ej: Filtro de aceite"></InputText>
+                        <ValidationMessage For="@(() => Repuesto.Nombre)" />
+
+                        @*Descripción*@
+                        <label class="form-label mb-0">
+                            <strong>Descripción</strong>
+                        </label>
+                        <InputText class="form-control" @bind-Value="Repuesto.Descripcion" placeholder="Ej: Calidad premium"></InputText>
+                        <ValidationMessage For="@(() => Repuesto.Descripcion)" />
+
+                        <div class="d-flex gap-2">
+                            <div class="flex-fill">
+                                @*Marca*@
+                                <label class="form-label mb-0">
+                                    <strong>Marca</strong>
+                                </label>
+                                <InputText class="form-control" @bind-Value="Repuesto.Marca" placeholder="Ej: NOK"></InputText>
+                                <ValidationMessage For="@(() => Repuesto.Marca)" />
+                            </div>
+
+                            <div class="flex-fill">
+                                @*Categoría*@
+                                <label class="form-label mb-0">
+                                    <strong>Categoría</strong>
+                                </label>
+                                <InputSelect class="form-select" @bind-Value="Repuesto.Categoria">
+                                    <option value="" disabled selected>Seleccione una categoría</option>
+                                    <option value="Filtros y lubricantes">Filtros y lubricantes</option>
+                                    <option value="Motor">Motor</option>
+                                    <option value="Frenos">Frenos</option>
+                                    <option value="Suspensión y dirección">Suspensión y dirección</option>
+                                    <option value="Eléctrico">Eléctrico</option>
+                                    <option value="Transmisión">Transmisión</option>
+                                    <option value="Accesorios">Accesorios</option>
+                                    <option value="Carrocería">Carrocería</option>
+                                </InputSelect>
+                                <ValidationMessage For="@(() => Repuesto.Categoria)" />
+                            </div>
+                        </div>
+
+                        @*Precio de venta*@
+                        <label class="form-label mb-0">
+                            <strong>Precio de Venta</strong>
+                        </label>
+                        <InputNumber class="form-control" @bind-Value="Repuesto.PrecioVenta" placeholder="Ej: 1500.00" step="0.01" />
+                        <ValidationMessage For="@(() => Repuesto.PrecioVenta)" />
+
+                        @*Imagen*@
+                        <label class="form-label mb-0">
+                            <strong>Imagen</strong>
+                        </label>
+                        <InputText class="form-control" @bind-Value="Repuesto.Imagen" placeholder="Ej: https://ejemplo.com/imagen.jpg"></InputText>
+
+                        @*Estado*@
+                        <div class="form-check mt-2">
+                            <InputCheckbox class="form-check-input" @bind-Value="Repuesto.Activo" />
+                            <label class="form-check-label"><strong>Activo</strong></label>
+                        </div>
+                    </div>
+                </div>
+
+                @*Botón Editar*@
+                <div class="card-footer d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">
+                        Editar
+                    </button>
+
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Eliminar
+                    </button>
+
+                    @*Botón Volver*@
+                    <a href="/Repuestos/Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+
+    @*Modal*@
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Desea la eliminación de este repuesto?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="Eliminar">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Repuesto no encontrado</p>
+}
+
+@code
+{
+    [Parameter]
+    public int RepuestoId { get; set; } = new();
+
+    public Repuestos? Repuesto { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Repuesto = (await RepuestoService.Buscar(RepuestoId)).Value;
+    }
+
+    private async Task Editar()
+    {
+        if (Repuesto == null)
+        {
+            return;
+        }
+
+        await RepuestoService.Guardar(Repuesto);
+        Navigation.NavigateTo("/Repuestos/Index");
+    }
+
+    private async Task Eliminar()
+    {
+        if (Repuesto == null)
+        {
+            return;
+        }
+
+        await RepuestoService.Eliminar(Repuesto.RepuestoId);
+        Navigation.NavigateTo("/Repuestos/Index");
+    }
+
+}
