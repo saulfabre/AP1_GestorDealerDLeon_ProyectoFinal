@@ -1,0 +1,198 @@
+@page "/Modelos/Index"
+
+@rendermode InteractiveServer
+
+@inject ModelosServices ModeloService
+
+<PageTitle>Modelos</PageTitle>
+
+<div class="container-fluid min-vh-100 p-3 p-lg-4">
+    <div class="card shadow-lg w-100">
+        <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <h5 class="mb-0">Consulta de Modelos</h5>
+            <button type="button" class="btn btn-primary" @onclick="AbrirModalCrear">
+                <i class="bi bi-plus"></i>
+                Crear
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-end gap-3">
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label class="form-label"><strong>Filtrar por</strong></label>
+                    <select class="form-select" @bind="Filtro">
+                        <option value="Marca">Marca</option>
+                        <option value="Nombre">Modelo</option>
+                    </select>
+                </div>
+
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label class="form-label"><strong>Estado</strong></label>
+                    <select class="form-select" @bind="EstadoFiltro">
+                        <option value="">Todos</option>
+                        <option value="Activos">Activos</option>
+                        <option value="Inactivos">Inactivos</option>
+                    </select>
+                </div>
+
+                <div class="d-flex flex-column flex-fill" style="min-width: 18rem;">
+                    <label class="form-label"><strong>Búsqueda</strong></label>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control flex-fill" placeholder="Buscar..." @bind="ValorFiltro" />
+                        <button class="btn btn-outline-primary" @onclick="Buscar" title="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" @onclick="Limpiar" title="Limpiar">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <QuickGrid Items="@Modelos.AsQueryable()" Class="table table-bordered mt-3 align-middle">
+                    <PropertyColumn Property="@(m => m.ModeloId)" Title="ID" Sortable="true" />
+                    <PropertyColumn Property="@(m => m.Marca)" Title="Marca" Sortable="true" />
+                    <PropertyColumn Property="@(m => m.Nombre)" Title="Modelo" Sortable="true" />
+                    <PropertyColumn Property="@(m => m.Vehiculos.Count)" Title="Vehículos" Sortable="true" />
+                    <TemplateColumn Title="Estado" SortBy="@(GridSort<Modelos>.ByAscending(m => m.Activo))">
+                        <span class="badge @(context.Activo ? "text-bg-success" : "text-bg-secondary")">
+                            @(context.Activo ? "Activo" : "Inactivo")
+                        </span>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Acciones">
+                        <div class="d-flex gap-2">
+                            <a href="@($"/Modelos/Edit/{context.ModeloId}")" class="btn btn-warning">
+                                Editar
+                            </a>
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <p class="mb-0"><strong>Cantidad: </strong>@Modelos.Count</p>
+        </div>
+    </div>
+
+    @if (MostrarModalCrear)
+    {
+        <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="tituloCrearModelo">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <EditForm Model="@ModeloNuevo" OnValidSubmit="CrearModelo">
+                        <DataAnnotationsValidator />
+                        <div class="modal-header">
+                            <h2 class="modal-title fs-5" id="tituloCrearModelo">Crear modelo</h2>
+                            <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CerrarModalCrear"></button>
+                        </div>
+                        <div class="modal-body d-flex flex-column gap-3">
+                            @if (!string.IsNullOrWhiteSpace(MensajeCrear))
+                            {
+                                <div class="alert alert-danger mb-0" role="alert">@MensajeCrear</div>
+                            }
+                            <div>
+                                <label for="nuevaMarca" class="form-label"><strong>Marca</strong></label>
+                                <InputText id="nuevaMarca" class="form-control" list="marcasExistentes" @bind-Value="ModeloNuevo.Marca" />
+                                <datalist id="marcasExistentes">
+                                    @foreach (var marca in MarcasExistentes)
+                                    {
+                                        <option value="@marca"></option>
+                                    }
+                                </datalist>
+                                <ValidationMessage For="@(() => ModeloNuevo.Marca)" />
+                            </div>
+                            <div>
+                                <label for="nuevoModelo" class="form-label"><strong>Modelo</strong></label>
+                                <InputText id="nuevoModelo" class="form-control" @bind-Value="ModeloNuevo.Nombre" />
+                                <ValidationMessage For="@(() => ModeloNuevo.Nombre)" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" @onclick="CerrarModalCrear">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus"></i> Crear
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+</div>
+
+@code {
+    private List<Modelos> Modelos { get; set; } = new();
+    private string Filtro { get; set; } = "Marca";
+    private string EstadoFiltro { get; set; } = "";
+    private string ValorFiltro { get; set; } = "";
+    private Modelos ModeloNuevo { get; set; } = new();
+    private List<string> MarcasExistentes { get; set; } = new();
+    private string MensajeCrear { get; set; } = "";
+    private bool MostrarModalCrear { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarModelos();
+    }
+
+    private async Task CargarModelos()
+    {
+        Modelos = (await ModeloService.GetList(m => true)).Value;
+        MarcasExistentes = Modelos.Select(m => m.Marca).Distinct().OrderBy(m => m).ToList();
+    }
+
+    private void AbrirModalCrear()
+    {
+        ModeloNuevo = new();
+        MensajeCrear = "";
+        MostrarModalCrear = true;
+    }
+
+    private void CerrarModalCrear() => MostrarModalCrear = false;
+
+    private async Task CrearModelo()
+    {
+        ModeloNuevo.Marca = ModeloNuevo.Marca.Trim();
+        ModeloNuevo.Nombre = ModeloNuevo.Nombre.Trim();
+
+        if (await ModeloService.ExisteNombre(ModeloNuevo.Marca, ModeloNuevo.Nombre))
+        {
+            MensajeCrear = "Ya existe ese modelo para esa marca.";
+            return;
+        }
+
+        await ModeloService.Guardar(ModeloNuevo);
+        MostrarModalCrear = false;
+        await CargarModelos();
+    }
+
+    private async Task Buscar()
+    {
+        var valor = ValorFiltro.Trim();
+        var estado = EstadoFiltro;
+
+        if (Filtro == "Marca")
+        {
+            Modelos = (await ModeloService.GetList(m =>
+                m.Marca.Contains(valor) &&
+                (estado == "" || (estado == "Activos" ? m.Activo : !m.Activo)))).Value;
+        }
+        else if (Filtro == "Nombre")
+        {
+            Modelos = (await ModeloService.GetList(m =>
+                m.Nombre.Contains(valor) &&
+                (estado == "" || (estado == "Activos" ? m.Activo : !m.Activo)))).Value;
+        }
+    }
+
+    private async Task Limpiar()
+    {
+        Filtro = "Marca";
+        EstadoFiltro = "";
+        ValorFiltro = "";
+        Modelos = (await ModeloService.GetList(m => true)).Value;
+    }
+}
