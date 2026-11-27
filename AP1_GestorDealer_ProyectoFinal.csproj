@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <UserSecretsId>AP1_GestorDealer_ProyectoFinal</UserSecretsId>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
@@ -22,6 +23,8 @@
 
   <ItemGroup>
     <ProjectReference Include="SignalR\SignalR.Shared\SignalR.Shared.csproj" />
+    <ProjectReference Include="DLeon.Data\DLeon.Data.csproj" />
+    <ProjectReference Include="DLeon.Services\DLeon.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>

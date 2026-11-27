@@ -1,6 +1,6 @@
 using AP1_GestorDealer_ProyectoFinal.Components;
-using AP1_GestorDealer_ProyectoFinal.Context;
-using AP1_GestorDealer_ProyectoFinal.Services;
+using DLeon.Data.Context;
+using DLeon.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<VehiculosServices>();
+builder.Services.AddScoped<ProveedoresServices>();
 
 builder.Services.AddDbContextFactory<Contexto>(
     o => o.UseSqlServer(
