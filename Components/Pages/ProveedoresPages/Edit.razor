@@ -31,19 +31,25 @@
                         <InputText class="form-control" @bind-Value="Proveedor.Nombre"></InputText>
                         <ValidationMessage For="@(() => Proveedor.Nombre)" />
 
-                        @*RNC*@
-                        <label class="form-label mb-0">
-                            <strong>RNC</strong>
-                        </label>
-                        <InputText class="form-control" @bind-Value="Proveedor.RNC"></InputText>
-                        <ValidationMessage For="@(() => Proveedor.RNC)" />
+                        <div class="d-flex gap-2">
+                            <div class="flex-fill">
+                                @*RNC*@
+                                <label class="form-label mb-0">
+                                    <strong>RNC</strong>
+                                </label>
+                                <InputText class="form-control" @bind-Value="Proveedor.RNC"></InputText>
+                                <ValidationMessage For="@(() => Proveedor.RNC)" />
+                            </div>
 
-                        @*Teléfono*@
-                        <label class="form-label mb-0">
-                            <strong>Teléfono</strong>
-                        </label>
-                        <InputText class="form-control" @bind-Value="Proveedor.Telefono"></InputText>
-                        <ValidationMessage For="@(() => Proveedor.Telefono)" />
+                            <div class="flex-fill">
+                                @*Teléfono*@
+                                <label class="form-label mb-0">
+                                    <strong>Teléfono</strong>
+                                </label>
+                                <InputText class="form-control" @bind-Value="Proveedor.Telefono"></InputText>
+                                <ValidationMessage For="@(() => Proveedor.Telefono)" />
+                            </div>
+                        </div>
 
                         @*Correo*@
                         <label class="form-label mb-0">
