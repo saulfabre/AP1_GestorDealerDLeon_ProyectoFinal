@@ -28,7 +28,7 @@
                         <label class="form-label mb-0">
                             <strong>Nombre</strong>
                         </label>
-                        <InputText class="form-control" @bind-Value="Proveedor.Nombre" placeholder="Ej. Auto Repuestos XYZ"></InputText>
+                        <InputText class="form-control" @bind-Value="Proveedor.Nombre" placeholder="Ej: Auto Repuestos XYZ"></InputText>
                         <ValidationMessage For="@(() => Proveedor.Nombre)" />
 
                         <div class="d-flex gap-2">
@@ -37,7 +37,7 @@
                                 <label class="form-label mb-0">
                                     <strong>RNC</strong>
                                 </label>
-                                <InputText class="form-control" @bind-Value="Proveedor.RNC" placeholder="000-00000-0"></InputText>
+                                <InputText class="form-control" @bind-Value="Proveedor.RNC" placeholder="Ej: 000-00000-0"></InputText>
                                 <ValidationMessage For="@(() => Proveedor.RNC)" />
                             </div>
 
@@ -46,7 +46,7 @@
                                 <label class="form-label mb-0">
                                     <strong>Teléfono</strong>
                                 </label>
-                                <InputText class="form-control" @bind-Value="Proveedor.Telefono" placeholder="809-000-0000"></InputText>
+                                <InputText class="form-control" @bind-Value="Proveedor.Telefono" placeholder="Ej: 809-000-0000"></InputText>
                                 <ValidationMessage For="@(() => Proveedor.Telefono)" />
                             </div>
                         </div>
@@ -55,14 +55,14 @@
                         <label class="form-label mb-0">
                             <strong>Correo</strong>
                         </label>
-                        <InputText class="form-control" @bind-Value="Proveedor.Correo" placeholder="proveedor@gmail.com"></InputText>
+                        <InputText class="form-control" @bind-Value="Proveedor.Correo" placeholder="Ej: proveedor@gmail.com"></InputText>
                         <ValidationMessage For="@(() => Proveedor.Correo)" />
 
                         @*Dirección*@
                         <label class="form-label mb-0">
                             <strong>Dirección</strong>
                         </label>
-                        <InputText class="form-control" @bind-Value="Proveedor.Direccion" placeholder="Calle Principal #123"></InputText>
+                        <InputText class="form-control" @bind-Value="Proveedor.Direccion" placeholder="Ej: Calle Principal #123"></InputText>
                         <ValidationMessage For="@(() => Proveedor.Direccion)" />
 
                         @*Estado*@
