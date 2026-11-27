@@ -1,0 +1,95 @@
+@page "/Proveedores/Create"
+
+@rendermode InteractiveServer
+
+@inject ProveedoresServices ProveedorService
+@inject NavigationManager Navigation
+
+<PageTitle>Crear Proveedor</PageTitle>
+
+<EditForm Model="Proveedor" OnValidSubmit="Guardar">
+
+    <DataAnnotationsValidator />
+
+    @*Encabezado de la creación de proveedores*@
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header d-flex align-items-center" style="height: 50px;">
+                <h5 class="mb-0">Crear Proveedor</h5>
+            </div>
+
+            @*Formulario para la creación de un proveedor*@
+            <div class="card-body">
+                <div class="d-flex flex-column gap-2">
+
+                    @*Nombre*@
+                    <label class="form-label mb-0">
+                        <strong>Nombre</strong>
+                    </label>
+                    <InputText class="form-control" @bind-Value="Proveedor.Nombre"></InputText>
+                    <ValidationMessage For="@(() => Proveedor.Nombre)" />
+
+                    @*RNC*@
+                    <label class="form-label mb-0">
+                        <strong>RNC</strong>
+                    </label>
+                    <InputText class="form-control" @bind-Value="Proveedor.RNC"></InputText>
+                    <ValidationMessage For="@(() => Proveedor.RNC)" />
+
+                    @*Teléfono*@
+                    <label class="form-label mb-0">
+                        <strong>Teléfono</strong>
+                    </label>
+                    <InputText class="form-control" @bind-Value="Proveedor.Telefono"></InputText>
+                    <ValidationMessage For="@(() => Proveedor.Telefono)" />
+
+                    @*Correo*@
+                    <label class="form-label mb-0">
+                        <strong>Correo</strong>
+                    </label>
+                    <InputText class="form-control" @bind-Value="Proveedor.Correo"></InputText>
+                    <ValidationMessage For="@(() => Proveedor.Correo)" />
+
+                    @*Dirección*@
+                    <label class="form-label mb-0">
+                        <strong>Dirección</strong>
+                    </label>
+                    <InputText class="form-control" @bind-Value="Proveedor.Direccion"></InputText>
+                    <ValidationMessage For="@(() => Proveedor.Direccion)" />
+
+                    @*Estado*@
+                    <div class="form-check mt-2">
+                        <InputCheckbox class="form-check-input" @bind-Value="Proveedor.Activo" />
+                        <label class="form-check-label"><strong>Activo</strong></label>
+                    </div>
+                </div>
+            </div>
+
+            @*Botón Crear*@
+            <div class="card-footer d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus"></i>
+                    Crear
+                </button>
+
+                @*Botón Volver*@
+                <a href="/Proveedores/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code
+{
+    public Proveedores Proveedor { get; set; } = new();
+
+    private async Task Guardar()
+    {
+        await ProveedorService.Guardar(Proveedor);
+        Proveedor = new();
+        Navigation.NavigateTo("/Proveedores/Index");
+    }
+}
