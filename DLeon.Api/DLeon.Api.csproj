@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DLeon.Data\DLeon.Data.csproj" />
     <ProjectReference Include="..\DLeon.Services\DLeon.Services.csproj" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.21" />
   </ItemGroup>
 
 </Project>
