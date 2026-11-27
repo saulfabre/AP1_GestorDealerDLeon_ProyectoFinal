@@ -13,4 +13,5 @@ public class Contexto : DbContext
 
     public DbSet<Vehiculos> Vehiculos { get; set; }
     public DbSet<Proveedores> Proveedores { get; set; }
+    public DbSet<Repuestos> Repuestos { get; set; }
 }

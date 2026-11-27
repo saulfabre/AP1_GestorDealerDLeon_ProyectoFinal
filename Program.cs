@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<VehiculosServices>();
 builder.Services.AddScoped<ProveedoresServices>();
+builder.Services.AddScoped<RepuestosServices>();
 
 builder.Services.AddDbContextFactory<Contexto>(
     o => o.UseSqlServer(
