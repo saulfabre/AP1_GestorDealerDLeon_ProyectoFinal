@@ -1,0 +1,344 @@
+@page "/ComprasRepuestos/Edit/{CompraId:int}"
+
+@rendermode InteractiveServer
+
+@inject ComprasRepuestosServices CompraService
+@inject ProveedoresServices ProveedorService
+@inject RepuestosServices RepuestoService
+@inject NavigationManager Navigation
+
+<PageTitle>Editar compra</PageTitle>
+
+@if (Compra != null)
+{
+    <EditForm Model="Compra" OnValidSubmit="Modificar" FormName="EditarCompraRepuestos">
+
+        <DataAnnotationsValidator />
+
+        @*Encabezado de la edición de compras de repuestos*@
+        <div class="container">
+            <div class="card shadow-lg">
+                <div class="card-header d-flex justify-content-between align-items-center" style="height: 50px;">
+                    <h5 class="mb-0">Editar Compra</h5>
+                </div>
+
+                @*Formulario para la edición de una compra de repuestos*@
+                <div class="card-body">
+                    @*Datos de la compra*@
+                    <div class="d-flex gap-3">
+                        <div class="flex-grow-1 w-50 mb-3">
+                            @*Proveedor*@
+                            <label class="form-label"><strong>Proveedor</strong></label>
+                            <InputSelect class="form-select" @bind-Value="Compra.ProveedorId">
+                                <option value="0" selected disabled>Seleccione un proveedor</option>
+                                @foreach (var proveedor in Proveedores)
+                                {
+                                    <option value="@proveedor.ProveedorId">@proveedor.Nombre</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Compra.ProveedorId)" />
+                        </div>
+
+                        <div class="flex-grow-1 w-50 mb-3">
+                            @*Fecha*@
+                            <label class="form-label"><strong>Fecha</strong></label>
+                            <InputDate class="form-control" @bind-Value="Compra.Fecha" />
+                            <ValidationMessage For="@(() => Compra.Fecha)" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <div class="flex-fill mb-3">
+                            @*Número de factura*@
+                            <label class="form-label"><strong>N.° de factura</strong></label>
+                            <InputText class="form-control" @bind-Value="Compra.NumeroFactura" placeholder="Ej: FAC-001" />
+                            <ValidationMessage For="@(() => Compra.NumeroFactura)" />
+                        </div>
+
+                        <div class="flex-fill mb-3">
+                            @*Observación*@
+                            <label class="form-label"><strong>Observación</strong></label>
+                            <InputText class="form-control" @bind-Value="Compra.Observacion" />
+                            <ValidationMessage For="@(() => Compra.Observacion)" />
+                        </div>
+                    </div>
+
+                    @*Detalles de la compra*@
+                    <div class="border rounded p-3 mt-4">
+                        <h5>Detalles de la Compra</h5>
+                        <hr />
+
+                        <div class="d-flex gap-3 flex-wrap align-items-end">
+                            <div class="flex-grow-1">
+                                @*Repuesto*@
+                                <label class="form-label"><strong>Repuesto</strong></label>
+                                <div class="dropdown position-relative">
+                                    <button type="button" class="form-select text-start"
+                                            @onclick="() => ListaRepuestosAbierta = !ListaRepuestosAbierta">
+                                        @if (RepuestoSeleccionado == null)
+                                        {
+                                            <span class="text-muted">Seleccione un repuesto</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="d-flex align-items-center gap-2">
+                                                @if (!string.IsNullOrWhiteSpace(RepuestoSeleccionado.Imagen))
+                                                {
+                                                    <img src="@RepuestoSeleccionado.Imagen" alt="" class="rounded-circle"
+                                                         style="width: 32px; height: 32px; object-fit: cover;" />
+                                                }
+                                                <span>
+                                                    <span class="d-block">@RepuestoSeleccionado.Nombre</span>
+                                                    <span class="small text-muted">
+                                                        REP-@RepuestoSeleccionado.RepuestoId.ToString("D3") - Existencia:
+                                                        @RepuestoSeleccionado.Existencia
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        }
+                                    </button>
+                                    @if (ListaRepuestosAbierta)
+                                    {
+                                        <div id="repuestosDisponibles" class="dropdown-menu show w-100 p-1"
+                                             style="max-height: 280px; overflow-y: auto;">
+                                            @foreach (var repuesto in Repuestos)
+                                            {
+                                                <button type="button" class="dropdown-item d-flex align-items-center gap-2"
+                                                        @onclick="@(() => { NuevoRepuestoId = repuesto.RepuestoId; ListaRepuestosAbierta = false; })">
+                                                    @if (!string.IsNullOrWhiteSpace(repuesto.Imagen))
+                                                    {
+                                                        <img src="@repuesto.Imagen" alt="" class="rounded-circle"
+                                                             style="width: 36px; height: 36px; object-fit: cover;" />
+                                                    }
+                                                    <span>
+                                                        <span class="d-block">@repuesto.Nombre</span>
+                                                        <span class="small text-muted">
+                                                            REP-@repuesto.RepuestoId.ToString("D3") - Existencia:
+                                                            @repuesto.Existencia
+                                                        </span>
+                                                    </span>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="w-25">
+                                @*Precio de compra*@
+                                <label class="form-label"><strong>Precio de compra</strong></label>
+                                <InputNumber class="form-control" @bind-Value="NuevoPrecio" />
+                            </div>
+
+                            <div class="w-25">
+                                @*Cantidad*@
+                                <label class="form-label"><strong>Cantidad</strong></label>
+                                <div class="input-group">
+                                    <InputNumber class="form-control" @bind-Value="NuevaCantidad" />
+                                    <button type="button" class="btn btn-outline-primary" @onclick="AgregarDetalle">
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            @*Repuestos agregados a la compra*@
+                            @foreach (var detalle in Compra.Detalles)
+                            {
+                                var repuesto = Repuestos.FirstOrDefault(r => r.RepuestoId == detalle.RepuestoId);
+
+                                <div class="border-bottom py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if (!string.IsNullOrWhiteSpace(repuesto?.Imagen))
+                                        {
+                                            <img src="@repuesto.Imagen" alt="Imagen de @repuesto.Nombre" class="rounded"
+                                                 style="width: 60px; height: 60px; object-fit: cover;" />
+                                        }
+                                        <div>
+                                            <strong>@repuesto?.Nombre</strong>
+                                            <div class="small text-muted">REP-@detalle.RepuestoId.ToString("D3")</div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-sm ms-auto"
+                                                title="Quitar repuesto" @onclick="() => EliminarDetalle(detalle)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-4 align-items-end mt-3">
+                                        <div class="flex-fill">
+                                            <label class="form-label mb-1"><strong>Precio</strong></label>
+                                            <div>RD$ @detalle.Precio.ToString("N2")</div>
+                                        </div>
+                                        <div class="flex-fill">
+                                            <label class="form-label mb-1"><strong>Cantidad</strong></label>
+                                            <InputNumber class="form-control" @bind-Value="detalle.Cantidad" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="w-50">
+                                @*Total de la compra*@
+                                <label class="form-label"><strong>Total</strong></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">RD$</span>
+                                    <input class="form-control text-end fw-bold"
+                                           value="@(Compra.Detalles.Sum(d => d.Cantidad * d.Precio).ToString("N2"))"
+                                           readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*Botón Guardar cambios*@
+                <div class="card-footer d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-check-lg"></i>
+                        Guardar cambios
+                    </button>
+
+                    @*Botón Eliminar*@
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarCompraModal">
+                        Eliminar
+                    </button>
+
+                    @*Botón Volver*@
+                    <a href="/ComprasRepuestos/Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+
+    @*Modal para confirmar la eliminación de la compra*@
+    <div class="modal fade" id="eliminarCompraModal" tabindex="-1" aria-labelledby="eliminarCompraLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarCompraLabel">Confirmar eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar esta compra? Se descontarán del inventario las cantidades registradas.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="Eliminar">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container">
+        <p>Compra no encontrada.</p>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public int CompraId { get; set; }
+
+    private ComprasRepuestos? Compra { get; set; }
+    private List<Proveedores> Proveedores { get; set; } = new();
+    private List<Repuestos> Repuestos { get; set; } = new();
+    private int NuevoRepuestoId { get; set; }
+    private int NuevaCantidad { get; set; }
+    private decimal NuevoPrecio { get; set; }
+    private bool ListaRepuestosAbierta { get; set; }
+    private Repuestos? RepuestoSeleccionado => Repuestos.FirstOrDefault(r => r.RepuestoId == NuevoRepuestoId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var proveedoresResult = await ProveedorService.GetList(p => true);
+        if (proveedoresResult.IsSuccess)
+        {
+            Proveedores = proveedoresResult.Value;
+        }
+
+        var repuestosResult = await RepuestoService.GetList(r => true);
+        if (repuestosResult.IsSuccess)
+        {
+            Repuestos = repuestosResult.Value;
+        }
+
+        var compraResult = await CompraService.Buscar(CompraId);
+        if (compraResult.IsSuccess)
+        {
+            Compra = compraResult.Value;
+        }
+    }
+
+    private void AgregarDetalle()
+    {
+        if (Compra == null)
+        {
+            return;
+        }
+
+        var repuesto = Repuestos.FirstOrDefault(r => r.RepuestoId == NuevoRepuestoId);
+
+        if (repuesto == null)
+        {
+            return;
+        }
+
+        Compra.Detalles.Add(new ComprasRepuestosDetalles
+        {
+            RepuestoId = repuesto.RepuestoId,
+            Cantidad = NuevaCantidad,
+            Precio = NuevoPrecio
+        });
+
+        NuevoRepuestoId = 0;
+        NuevaCantidad = 0;
+        NuevoPrecio = 0;
+        ListaRepuestosAbierta = false;
+    }
+
+    private void EliminarDetalle(ComprasRepuestosDetalles detalle)
+    {
+        Compra?.Detalles.Remove(detalle);
+    }
+
+    private async Task Modificar()
+    {
+        if (Compra == null)
+        {
+            return;
+        }
+
+        Compra.Total = Compra.Detalles.Sum(d => d.Cantidad * d.Precio);
+        var resultado = await CompraService.Guardar(Compra);
+
+        if (resultado.IsSuccess)
+        {
+            Navigation.NavigateTo("/ComprasRepuestos/Index?resultado=actualizada");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        if (Compra == null)
+        {
+            return;
+        }
+
+        var resultado = await CompraService.Eliminar(Compra.CompraId);
+
+        if (resultado.IsSuccess)
+        {
+            Navigation.NavigateTo("/ComprasRepuestos/Index?resultado=eliminada");
+        }
+    }
+}

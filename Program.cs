@@ -10,6 +10,7 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<VehiculosServices>();
 builder.Services.AddScoped<ProveedoresServices>();
 builder.Services.AddScoped<RepuestosServices>();
+builder.Services.AddScoped<ComprasRepuestosServices>();
 
 builder.Services.AddDbContextFactory<Contexto>(
     o => o.UseSqlServer(
