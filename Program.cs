@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddScoped<VehiculosServices>();
+builder.Services.AddScoped<ModelosServices>();
 builder.Services.AddScoped<ProveedoresServices>();
 builder.Services.AddScoped<RepuestosServices>();
 builder.Services.AddScoped<ComprasRepuestosServices>();
@@ -31,6 +32,24 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.Value?.EndsWith(".avif", StringComparison.OrdinalIgnoreCase) == true)
+    {
+        context.Response.OnStarting(() =>
+        {
+            if (context.Response.StatusCode == StatusCodes.Status200OK)
+            {
+                context.Response.ContentType = "image/avif";
+            }
+
+            return Task.CompletedTask;
+        });
+    }
+
+    await next();
+});
+app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapStaticAssets();

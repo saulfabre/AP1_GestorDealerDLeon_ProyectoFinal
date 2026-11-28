@@ -1,0 +1,410 @@
+@page "/Vehiculos/Edit/{VehiculoId:int}"
+
+@rendermode InteractiveServer
+
+@inject VehiculosServices VehiculoService
+@inject ModelosServices ModeloService
+@inject NavigationManager Navigation
+@inject IWebHostEnvironment Environment
+
+<PageTitle>Editar Vehículo</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex align-items-center py-2">
+            <h5 class="mb-0">Editar Vehículo</h5>
+        </div>
+
+        @if (Vehiculo is not null)
+        {
+            <EditForm Model="@Vehiculo" OnValidSubmit="Guardar">
+                <DataAnnotationsValidator />
+
+                <div class="card-body d-flex flex-column gap-3">
+                    @if (!string.IsNullOrEmpty(Mensaje))
+                    {
+                        <div class="alert alert-danger d-flex align-items-center gap-2 mb-0">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            @Mensaje
+                        </div>
+                    }
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="marca" class="form-label"><strong>Marca</strong></label>
+                            <InputSelect id="marca" class="form-select" @bind-Value="MarcaSeleccionada" @bind-Value:after="CambiarMarca">
+                                <option value="">Seleccione una marca</option>
+                                @foreach (var marca in Marcas)
+                                {
+                                    <option value="@marca">@marca</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="modelo" class="form-label">
+                                <strong>Modelo</strong>
+                            </label>
+                            <InputSelect id="modelo" 
+                                        class="form-select" 
+                                        @bind-Value="Vehiculo.ModeloId">
+                                <option value="0">
+                                    Seleccione un modelo
+                                </option>
+                                @foreach (var modelo in ModelosDeMarca)
+                                {
+                                    <option value="@modelo.ModeloId">@modelo.Nombre</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vehiculo.ModeloId)" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="ano" class="form-label"><strong>Año</strong></label>
+                            <InputNumber id="ano" 
+                                        class="form-control" 
+                                        @bind-Value="Vehiculo.Ano" />
+                            <ValidationMessage For="@(() => Vehiculo.Ano)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="matricula" class="form-label">
+                                <strong>Matrícula</strong>
+                            </label>
+                            <InputText id="matricula" 
+                                        class="form-control" 
+                                        @bind-Value="Vehiculo.Matricula" />
+                            <ValidationMessage For="@(() => Vehiculo.Matricula)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="color" class="form-label">
+                                <strong>Color</strong>
+                            </label>
+                            <InputText id="color" 
+                                        class="form-control" 
+                                        @bind-Value="Vehiculo.Color" />
+                            <ValidationMessage For="@(() => Vehiculo.Color)" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="precio" class="form-label">
+                                <strong>Precio</strong>
+                            </label>
+                            <InputNumber id="precio" 
+                                        class="form-control" 
+                                        @bind-Value="Vehiculo.Precio" />
+                            <ValidationMessage For="@(() => Vehiculo.Precio)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="kilometraje" class="form-label">
+                                <strong>Kilometraje</strong>
+                            </label>
+                            <InputNumber id="kilometraje" 
+                                        class="form-control" 
+                                        @bind-Value="Vehiculo.Kilometraje" />
+                            <ValidationMessage For="@(() => Vehiculo.Kilometraje)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="tipo" class="form-label">
+                                <strong>Tipo</strong>
+                            </label>
+                            <InputSelect id="tipo" 
+                                        class="form-select" 
+                                        @bind-Value="Vehiculo.Tipo">
+                                <option value="Sedan">
+                                    Sedan
+                                </option>
+                                <option value="SUV">
+                                    SUV
+                                </option>
+                                <option value="Camioneta">
+                                    Camioneta
+                                </option>
+                                <option value="Hatchback">
+                                    Hatchback
+                                </option>
+                                <option value="Coupé">
+                                    Coupé
+                                </option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vehiculo.Tipo)" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="combustible" class="form-label">
+                                <strong>Combustible</strong>
+                            </label>
+                            <InputSelect id="combustible" 
+                                        class="form-select"
+                                        @bind-Value="Vehiculo.Combustible">
+                                <option value="Gasolina">
+                                    Gasolina
+                                </option>
+                                <option value="Gas">
+                                    Gas
+                                </option>
+                                <option value="Gas Oil">
+                                    Gas Oil
+                                </option>
+                                <option value="Electrico">
+                                    Eléctrico
+                                </option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vehiculo.Combustible)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="transmision" class="form-label">
+                                <strong>Transmisión</strong>
+                            </label>
+                            <InputSelect id="transmision" 
+                                        class="form-select" 
+                                        @bind-Value="Vehiculo.Transmision">
+                                <option value="Automatico">
+                                    Automático
+                                </option>
+                                <option value="Manual">
+                                    Manual
+                                </option>
+                                <option value="Hibrido">
+                                    Híbrido
+                                </option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vehiculo.Transmision)" />
+                        </div>
+                        <div class="d-flex flex-column flex-fill">
+                            <label for="estado" class="form-label">
+                                <strong>Estado</strong>
+                            </label>
+                            <InputSelect id="estado" 
+                                        class="form-select" 
+                                        @bind-Value="Vehiculo.Estado" 
+                                        disabled="@EsVendido">
+                                <option value="Disponible">
+                                    Disponible
+                                </option>
+                                <option value="Reservado">
+                                    Reservado
+                                </option>
+                                <option value="Inactivo">
+                                    Inactivo
+                                </option>
+                                <option value="Vendido">
+                                    Vendido
+                                </option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Vehiculo.Estado)" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <label for="foto" class="form-label"><strong>Fotografía</strong></label>
+                        <InputFile id="foto" class="form-control" accept="image/*" OnChange="CargarImagen" />
+                        @if (!string.IsNullOrWhiteSpace(MensajeImagen))
+                        {
+                            <div class="alert alert-warning mb-0">@MensajeImagen</div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(Vehiculo.Foto))
+                        {
+                            <div class="ratio ratio-16x9">
+                                <img src="@Vehiculo.Foto" alt="Vista previa del vehículo" class="w-100 h-100 object-fit-cover rounded" />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-footer d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-floppy"></i>
+                        Guardar cambios
+                    </button>
+                    @if (!EsVendido)
+                    {
+                        <button type="button" class="btn btn-danger" @onclick="AbrirModalEliminar">
+                            <i class="bi bi-trash"></i>
+                            Eliminar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" @onclick="DarDeBaja">
+                            <i class="bi bi-slash-circle"></i>
+                            Dar de baja
+                        </button>
+                    }
+                    <a href="/Vehiculos/Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i>
+                        Volver
+                    </a>
+                </div>
+            </EditForm>
+
+            @if (MostrarModalEliminar)
+            {
+                <div class="modal d-block" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="tituloEliminarVehiculo">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="tituloEliminarVehiculo">Eliminar vehículo</h5>
+                                <button type="button" class="btn-close" aria-label="Cerrar" @onclick="CerrarModalEliminar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="mb-2">¿Seguro que desea eliminar este vehículo?</p>
+                                <strong>@Vehiculo.Modelo?.Marca @Vehiculo.Modelo?.Nombre</strong>
+                                <span class="d-block text-secondary">@Vehiculo.Matricula</span>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
+                                <button type="button" class="btn btn-danger" @onclick="EliminarVehiculo">
+                                    <i class="bi bi-trash"></i>
+                                    Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop fade show"></div>
+            }
+        }
+        else
+        {
+            <div class="card-body d-flex flex-column align-items-center gap-2">
+                <p class="mb-0">El vehículo no fue encontrado.</p>
+                <a href="/Vehiculos/Index" class="btn btn-outline-secondary">Volver</a>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int VehiculoId { get; set; }
+
+    private Vehiculos? Vehiculo { get; set; }
+    private List<Modelos> TodosModelos { get; set; } = new();
+    private List<Modelos> ModelosDeMarca { get; set; } = new();
+    private List<string> Marcas { get; set; } = new();
+    private string MarcaSeleccionada { get; set; } = "";
+    private string Mensaje { get; set; } = "";
+    private string MensajeImagen { get; set; } = "";
+    private bool EsVendido => Vehiculo?.Estado == "Vendido";
+    private bool MostrarModalEliminar { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Vehiculo = (await VehiculoService.Buscar(VehiculoId)).Value;
+        TodosModelos = (await ModeloService.GetList(m => true)).Value;
+        Marcas = TodosModelos.Select(m => m.Marca).Distinct().OrderBy(m => m).ToList();
+
+        if (Vehiculo is not null)
+        {
+            var modeloActual = TodosModelos.FirstOrDefault(m => m.ModeloId == Vehiculo.ModeloId);
+            MarcaSeleccionada = modeloActual?.Marca ?? "";
+            ActualizarModelosDeMarca();
+        }
+    }
+
+    private void CambiarMarca()
+    {
+        MarcaSeleccionada = MarcaSeleccionada.Trim();
+        Vehiculo!.ModeloId = 0;
+        ActualizarModelosDeMarca();
+    }
+
+    private void ActualizarModelosDeMarca()
+    {
+        ModelosDeMarca = TodosModelos
+            .Where(m => (m.Activo || m.ModeloId == Vehiculo?.ModeloId) &&
+                        string.Equals(m.Marca, MarcaSeleccionada, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(m => m.Nombre)
+            .ToList();
+    }
+
+    private async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        MensajeImagen = "";
+        var archivo = e.File;
+
+        if (archivo.Size > 5 * 1024 * 1024)
+        {
+            MensajeImagen = "La imagen no puede superar 5 MB.";
+            return;
+        }
+
+        var extension = Path.GetExtension(archivo.Name).ToLowerInvariant();
+        if (extension is not ".jpg" and not ".jpeg" and not ".png" and not ".webp" and not ".avif")
+        {
+            MensajeImagen = "Seleccione una imagen JPG, PNG, WEBP o AVIF.";
+            return;
+        }
+
+        var carpeta = Path.Combine(Environment.WebRootPath, "uploads", "vehiculos");
+        Directory.CreateDirectory(carpeta);
+        var nombre = $"{Guid.NewGuid():N}{extension}";
+        var ruta = Path.Combine(carpeta, nombre);
+
+        await using var origen = archivo.OpenReadStream(5 * 1024 * 1024);
+        await using var destino = File.Create(ruta);
+        await origen.CopyToAsync(destino);
+
+        Vehiculo!.Foto = $"/uploads/vehiculos/{nombre}";
+    }
+
+    private async Task Guardar()
+    {
+        if (Vehiculo is null)
+        {
+            return;
+        }
+
+        Mensaje = "";
+        Vehiculo.Matricula = Vehiculo.Matricula.Trim().ToUpperInvariant();
+
+        if (Vehiculo.ModeloId == 0)
+        {
+            Mensaje = "Seleccione una marca y un modelo.";
+            return;
+        }
+
+        if (await VehiculoService.ExisteMatricula(Vehiculo.Matricula, Vehiculo.VehiculoId))
+        {
+            Mensaje = "Ya existe otro vehículo con esa matrícula.";
+            return;
+        }
+
+        await VehiculoService.Guardar(Vehiculo);
+        Navigation.NavigateTo("/Vehiculos/Index");
+    }
+
+    private void AbrirModalEliminar()
+    {
+        MostrarModalEliminar = true;
+    }
+
+    private void CerrarModalEliminar()
+    {
+        MostrarModalEliminar = false;
+    }
+
+    private async Task EliminarVehiculo()
+    {
+        if (Vehiculo is null)
+        {
+            return;
+        }
+
+        await VehiculoService.Eliminar(Vehiculo.VehiculoId);
+        Navigation.NavigateTo("/Vehiculos/Index");
+    }
+
+    private async Task DarDeBaja()
+    {
+        if (Vehiculo is null)
+        {
+            return;
+        }
+
+        await VehiculoService.CambiarEstado(Vehiculo.VehiculoId, "Inactivo");
+        Navigation.NavigateTo("/Vehiculos/Index");
+    }
+}

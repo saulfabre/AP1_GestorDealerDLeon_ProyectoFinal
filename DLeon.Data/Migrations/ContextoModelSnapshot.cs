@@ -34,6 +34,18 @@ namespace DLeon.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NumeroFactura")
+            modelBuilder.Entity("DLeon.Data.Models.Modelos", b =>
+                {
+                    b.Property<int>("ModeloId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModeloId"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -85,6 +97,17 @@ namespace DLeon.Data.Migrations
                     b.HasIndex("RepuestoId");
 
                     b.ToTable("ComprasRepuestosDetalles");
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ModeloId");
+
+                    b.HasIndex("Marca", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Modelos");
                 });
 
             modelBuilder.Entity("DLeon.Data.Models.Proveedores", b =>
@@ -157,6 +180,7 @@ namespace DLeon.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("PrecioVenta")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("RepuestoId");
@@ -177,39 +201,55 @@ namespace DLeon.Data.Migrations
 
                     b.Property<string>("Color")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Combustible")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Foto")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Kilometraje")
                         .HasColumnType("int");
 
-                    b.Property<string>("Marca")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Matricula")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Modelo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ModeloId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Transmision")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.HasKey("VehiculoId");
+
+                    b.HasIndex("Matricula")
+                        .IsUnique();
+
+                    b.HasIndex("ModeloId");
 
                     b.ToTable("Vehiculos");
                 });
@@ -247,6 +287,20 @@ namespace DLeon.Data.Migrations
             modelBuilder.Entity("DLeon.Data.Models.ComprasRepuestos", b =>
                 {
                     b.Navigation("Detalles");
+            modelBuilder.Entity("DLeon.Data.Models.Vehiculos", b =>
+                {
+                    b.HasOne("DLeon.Data.Models.Modelos", "Modelo")
+                        .WithMany("Vehiculos")
+                        .HasForeignKey("ModeloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Modelo");
+                });
+
+            modelBuilder.Entity("DLeon.Data.Models.Modelos", b =>
+                {
+                    b.Navigation("Vehiculos");
                 });
 #pragma warning restore 612, 618
         }

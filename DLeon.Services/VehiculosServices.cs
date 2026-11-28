@@ -1,13 +1,13 @@
 using System.Linq.Expressions;
 using Aplicada1.Core;
-using AP1_GestorDealer_ProyectoFinal.Context;
-using AP1_GestorDealer_ProyectoFinal.Models;
+using DLeon.Data.Context;
+using DLeon.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AP1_GestorDealer_ProyectoFinal.Services;
+namespace DLeon.Services;
 
-public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
-    ) : IServiceResult<Vehiculos, int>
+public class VehiculosServices(IDbContextFactory<Contexto> contextFactory)
+    : IServiceResult<Vehiculos, int>
 {
     public async Task<Result<Vehiculos?>> Buscar(int vehiculoId)
     {
@@ -20,6 +20,7 @@ public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         return await contexto.Vehiculos
+            .Include(v => v.Modelo)
             .Where(criterio)
             .AsNoTracking()
             .ToListAsync();
@@ -28,8 +29,7 @@ public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
     public async Task<bool> Existe(int vehiculoId)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        return await contexto.Vehiculos
-            .AnyAsync(v => v.VehiculoId == vehiculoId);
+        return await contexto.Vehiculos.AnyAsync(v => v.VehiculoId == vehiculoId);
     }
 
     public async Task<bool> ExisteMatricula(string matricula, int vehiculoId = 0)
@@ -49,7 +49,7 @@ public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
     public async Task<bool> Modificar(Vehiculos vehiculo)
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
-        contexto.Update(vehiculo);
+        contexto.Vehiculos.Update(vehiculo);
         return await contexto.SaveChangesAsync() > 0;
     }
 
@@ -57,9 +57,18 @@ public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
     {
         await using var contexto = await contextFactory.CreateDbContextAsync();
         var eliminado = await contexto.Vehiculos
-            .Where(v => v.VehiculoId == vehiculoId)
+            .Where(v => v.VehiculoId == vehiculoId && v.Estado != "Vendido")
             .ExecuteDeleteAsync() > 0;
         return Result.Success(eliminado);
+    }
+
+    public async Task<Result> CambiarEstado(int vehiculoId, string estado)
+    {
+        await using var contexto = await contextFactory.CreateDbContextAsync();
+        var modificado = await contexto.Vehiculos
+            .Where(v => v.VehiculoId == vehiculoId && v.Estado != "Vendido")
+            .ExecuteUpdateAsync(s => s.SetProperty(v => v.Estado, estado)) > 0;
+        return Result.Success(modificado);
     }
 
     public async Task<Result> Guardar(Vehiculos vehiculo)
@@ -68,9 +77,7 @@ public class VehiculosServices(IDbContextFactory<Contexto> contextFactory
         {
             return Result.Success(await Insertar(vehiculo));
         }
-        else
-        {
-            return Result.Success(await Modificar(vehiculo));
-        }
+
+        return Result.Success(await Modificar(vehiculo));
     }
 }
