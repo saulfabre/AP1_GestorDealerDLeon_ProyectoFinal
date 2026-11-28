@@ -73,7 +73,89 @@
                 @*Opciones*@
                 <TemplateColumn Title="Opciones">
                     <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#consultarModal-@context.RepuestoId">
+                            <i class="bi bi-eye"></i>
+                            Consultar
+                        </button>
                         <a href="@($"/Repuestos/Edit/{context.RepuestoId}")" class="btn btn-warning">Editar</a>
+                    </div>
+
+                    @*Modal de consulta del repuesto*@
+                    <div class="modal fade" id="consultarModal-@context.RepuestoId" tabindex="-1" role="dialog"
+                         aria-labelledby="consultarModalLabel-@context.RepuestoId" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="consultarModalLabel-@context.RepuestoId">Consultar Repuesto</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                                        @if (!string.IsNullOrWhiteSpace(context.Imagen))
+                                        {
+                                            <img src="@context.Imagen" alt="Imagen de @context.Nombre" class="img-thumbnail flex-shrink-0"
+                                                 style="width: 180px; height: 180px; object-fit: contain;"/>
+                            
+                                        }
+                                        else
+                                        {
+                                            <div class="border rounded bg-light d-flex align-items-center justify-content-center flex-shrink-0"
+                                                 style="width: 180px; height: 180px;">
+                                                <i class="bi bi-image text-secondary fs-1"></i>
+                                            </div>
+                                        }
+
+                                        <div class="flex-fill">
+                                            <p class="mb-2"><strong>Código:</strong> REP-@context.RepuestoId.ToString("D3")</p>
+                                            <p class="mb-2"><strong>Nombre:</strong> @context.Nombre</p>
+                                            <p class="mb-2"><strong>Marca:</strong> @(string.IsNullOrWhiteSpace(context.Marca) ? "No especificada" : context.Marca)</p>
+                                            <p class="mb-0"><strong>Categoría:</strong> @(string.IsNullOrWhiteSpace(context.Categoria) ? "No especificada" : context.Categoria)</p>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div class="d-flex gap-4 flex-wrap">
+                                        <div class="flex-fill">
+                                            <p class="mb-0"><strong>Precio de venta</strong><br />RD$ @context.PrecioVenta.ToString("N2")</p>
+                                        </div>
+                                        <div class="flex-fill">
+                                            <p class="mb-2"><strong>Existencia</strong><br />@context.Existencia</p>
+                                            <p class="mb-0">
+                                                <strong>Estado</strong <br>
+                                                @if (context.Activo)
+                                                {
+                                                    <span class="badge bg-success">Activo</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Inactivo</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <hr />
+
+                                    <div>
+                                        <strong>Descripción</strong>
+                                        @if (string.IsNullOrWhiteSpace(context.Descripcion))
+                                        {
+                                            <p class="text-muted mb-0">Sin descripción</p>
+                                        }
+                                        else
+                                        {
+                                            <p class="mb-0">@context.Descripcion</p>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </TemplateColumn>
             </QuickGrid>
