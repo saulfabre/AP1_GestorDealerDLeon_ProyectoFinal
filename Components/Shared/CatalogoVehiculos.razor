@@ -1,0 +1,231 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Components
+
+@rendermode InteractiveServer
+
+@inject VehiculosServices VehiculoService
+
+<section id="vehiculos" class="container py-4" aria-labelledby="catalogo-titulo">
+    @if (MostrarFiltros)
+    {
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3">
+            <h2 id="catalogo-titulo" class="h4 mb-0">Catalogo de vehiculos disponibles</h2>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-3 align-items-end">
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-marca" class="form-label fw-semibold">Marca</label>
+                    <select id="catalogo-marca" class="form-select" @bind="Marca">
+                        <option value="">Todas</option>
+                        @foreach (var marca in MarcasDisponibles)
+                        {
+                            <option value="@marca">@marca</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-modelo" class="form-label fw-semibold">Modelo</label>
+                    <select id="catalogo-modelo" class="form-select" @bind="Modelo">
+                        <option value="">Todos</option>
+                        @foreach (var modelo in ModelosDisponibles)
+                        {
+                            <option value="@modelo">@modelo</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-ano" class="form-label fw-semibold">AÃ±o desde</label>
+                    <select id="catalogo-ano" class="form-select" @bind="AnoDesde">
+                        <option value="">Todos</option>
+                        @foreach (var ano in AnosDisponibles)
+                        {
+                            <option value="@ano">@ano</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-precio" class="form-label fw-semibold">Precio máximo</label>
+                    <select id="catalogo-precio" class="form-select" @bind="PrecioMaximo">
+                        <option value="">Cualquier precio</option>
+                        @foreach (var precio in PreciosDisponibles)
+                        {
+                            <option value="@precio.ToString(CultureInfo.InvariantCulture)">@precio.ToString("N0", CultureInfo.CurrentCulture)</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-tipo" class="form-label fw-semibold">Tipo</label>
+                    <select id="catalogo-tipo" class="form-select" @bind="Tipo">
+                        <option value="">Todos</option>
+                        @foreach (var tipo in TiposDisponibles)
+                        {
+                            <option value="@tipo">@tipo</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-transmision" class="form-label fw-semibold">Transmisiónn</label>
+                    <select id="catalogo-transmision" class="form-select" @bind="Transmision">
+                        <option value="">Todas</option>
+                        @foreach (var transmision in TransmisionesDisponibles)
+                        {
+                            <option value="@transmision">@transmision</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
+                    <label for="catalogo-combustible" class="form-label fw-semibold">Combustible</label>
+                    <select id="catalogo-combustible" class="form-select" @bind="Combustible">
+                        <option value="">Todos</option>
+                        @foreach (var combustible in CombustiblesDisponibles)
+                        {
+                            <option value="@combustible">@combustible</option>
+                        }
+                    </select>
+                </div>
+                <div class="w-100 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-primary" @onclick="Buscar">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" @onclick="Limpiar">
+                        <i class="bi bi-x-lg"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Mensaje))
+    {
+        <div class="alert alert-danger" role="alert">@Mensaje</div>
+    }
+    else if (Vehiculos.Count == 0)
+    {
+        <div class="alert alert-info">No hay vehículos disponibles que coincidan con los filtros.</div>
+    }
+    else
+    {
+        <p class="text-muted">Mostrando @Vehiculos.Count vehículo(s) disponible(s).</p>
+    }
+
+    <div class="row g-4">
+        @foreach (var vehiculo in Vehiculos)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="card shadow-sm h-100 overflow-hidden">
+                    <div class="ratio ratio-16x9 bg-light border-bottom">
+                        @if (!string.IsNullOrWhiteSpace(vehiculo.Foto))
+                        {
+                            <img src="@vehiculo.Foto" alt="@($"{vehiculo.Ano} {vehiculo.Modelo?.Marca} {vehiculo.Modelo?.Nombre}")" class="w-100 h-100 object-fit-cover" />
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center text-secondary">
+                                <i class="bi bi-car-front fs-1" aria-hidden="true"></i>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-body d-flex flex-column gap-3">
+                        <h3 class="h5 card-title mb-0 fw-bold">@vehiculo.Ano @vehiculo.Modelo?.Marca @vehiculo.Modelo?.Nombre</h3>
+                        <div class="d-flex justify-content-between align-items-center gap-2 text-center">
+                            <div class="d-flex flex-column align-items-center flex-fill">
+                                <i class="bi bi-fuel-pump fs-4" aria-hidden="true"></i>
+                                <span>@vehiculo.Combustible</span>
+                            </div>
+                            <div class="d-flex flex-column align-items-center flex-fill">
+                                <i class="bi bi-speedometer2 fs-4" aria-hidden="true"></i>
+                                <span>@vehiculo.Kilometraje.ToString("N0") Km</span>
+                            </div>
+                            <div class="d-flex flex-column align-items-center flex-fill">
+                                <i class="bi bi-gear-wide-connected fs-4" aria-hidden="true"></i>
+                                <span>@vehiculo.Transmision</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-auto">
+                            <strong class="fs-5">RD$@vehiculo.Precio.ToString("N2")</strong>
+                            <a href="@($"/Vehiculos/Detalle/{vehiculo.VehiculoId}")" class="text-danger fw-semibold text-decoration-none">
+                                Ver detalles <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public bool MostrarFiltros { get; set; } = true;
+
+    private List<Vehiculos> Vehiculos { get; set; } = new();
+    private List<Vehiculos> CatalogoCompleto { get; set; } = new();
+    private string Marca { get; set; } = "";
+    private string Modelo { get; set; } = "";
+    private string AnoDesde { get; set; } = "";
+    private string PrecioMaximo { get; set; } = "";
+    private string Tipo { get; set; } = "";
+    private string Transmision { get; set; } = "";
+    private string Combustible { get; set; } = "";
+    private string? Mensaje { get; set; }
+
+    private IEnumerable<string> MarcasDisponibles => CatalogoCompleto
+        .Where(v => v.Modelo is not null).Select(v => v.Modelo!.Marca).Distinct().OrderBy(x => x);
+    private IEnumerable<string> ModelosDisponibles => CatalogoCompleto
+        .Where(v => v.Modelo is not null && (Marca == "" || v.Modelo.Marca == Marca))
+        .Select(v => v.Modelo!.Nombre).Distinct().OrderBy(x => x);
+    private IEnumerable<int> AnosDisponibles => CatalogoCompleto
+        .Select(v => v.Ano).Distinct().OrderByDescending(x => x);
+    private IEnumerable<decimal> PreciosDisponibles => CatalogoCompleto
+        .Select(v => v.Precio).Distinct().OrderBy(x => x);
+    private IEnumerable<string> TiposDisponibles => CatalogoCompleto.Select(v => v.Tipo).Distinct().OrderBy(x => x);
+    private IEnumerable<string> TransmisionesDisponibles => CatalogoCompleto
+        .Select(v => v.Transmision).Distinct().OrderBy(x => x);
+    private IEnumerable<string> CombustiblesDisponibles => CatalogoCompleto
+        .Select(v => v.Combustible).Distinct().OrderBy(x => x);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resultado = await VehiculoService.GetList(v => v.Estado == "Disponible");
+        if (resultado.IsSuccess)
+        {
+            CatalogoCompleto = resultado.Value;
+            Vehiculos = CatalogoCompleto;
+        }
+        else
+        {
+            Mensaje = resultado.Error.Description;
+        }
+    }
+
+    private void Limpiar()
+    {
+        Marca = "";
+        Modelo = "";
+        AnoDesde = "";
+        PrecioMaximo = "";
+        Tipo = "";
+        Transmision = "";
+        Combustible = "";
+        Mensaje = null;
+        Buscar();
+    }
+
+    private void Buscar()
+    {
+        var anoDesde = int.TryParse(AnoDesde, out var ano) ? ano : (int?)null;
+        var precioMaximo = decimal.TryParse(PrecioMaximo, NumberStyles.Number,
+            CultureInfo.InvariantCulture, out var precio) ? precio : (decimal?)null;
+
+        Vehiculos = CatalogoCompleto.Where(v =>
+            (Marca == "" || v.Modelo?.Marca == Marca) &&
+            (Modelo == "" || v.Modelo?.Nombre == Modelo) &&
+            (!anoDesde.HasValue || v.Ano >= anoDesde.Value) &&
+            (!precioMaximo.HasValue || v.Precio <= precioMaximo.Value) &&
+            (Tipo == "" || v.Tipo == Tipo) &&
+            (Transmision == "" || v.Transmision == Transmision) &&
+            (Combustible == "" || v.Combustible == Combustible)).ToList();
+    }
+}

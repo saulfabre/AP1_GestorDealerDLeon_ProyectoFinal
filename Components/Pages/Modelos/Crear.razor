@@ -1,0 +1,92 @@
+@page "/Modelos/Create"
+
+@rendermode InteractiveServer
+
+@inject ModelosServices ModeloService
+@inject NavigationManager Navigation
+
+<PageTitle>Crear Modelo</PageTitle>
+
+<EditForm Model="@Modelo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header d-flex align-items-center py-2">
+                <h5 class="mb-0">Crear Modelo</h5>
+            </div>
+
+            <div class="card-body d-flex flex-column gap-3">
+                @if (!string.IsNullOrEmpty(Mensaje))
+                {
+                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-0">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        @Mensaje
+                    </div>
+                }
+
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="d-flex flex-column flex-fill">
+                        <label class="form-label"><strong>Marca</strong></label>
+                        <InputText class="form-control" list="marcas" placeholder="Toyota, Honda..." @bind-Value="Modelo.Marca" />
+                        <datalist id="marcas">
+                            @foreach (var marca in MarcasExistentes)
+                            {
+                                <option value="@marca"></option>
+                            }
+                        </datalist>
+                        <ValidationMessage For="@(() => Modelo.Marca)" />
+                    </div>
+                    <div class="d-flex flex-column flex-fill">
+                        <label class="form-label"><strong>Modelo</strong></label>
+                        <InputText class="form-control" placeholder="Corolla, Civic..." @bind-Value="Modelo.Nombre" />
+                        <ValidationMessage For="@(() => Modelo.Nombre)" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus"></i>
+                    Crear
+                </button>
+                <a href="/Modelos/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Modelos Modelo { get; set; } = new();
+    private List<string> MarcasExistentes { get; set; } = new();
+    private string Mensaje { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Sugerencias para no escribir la misma marca de formas distintas.
+        MarcasExistentes = (await ModeloService.GetList(m => true)).Value
+            .Select(m => m.Marca)
+            .Distinct()
+            .OrderBy(m => m)
+            .ToList();
+    }
+
+    private async Task Guardar()
+    {
+        Mensaje = "";
+        Modelo.Marca = Modelo.Marca.Trim();
+        Modelo.Nombre = Modelo.Nombre.Trim();
+
+        if (await ModeloService.ExisteNombre(Modelo.Marca, Modelo.Nombre))
+        {
+            Mensaje = "Ya existe ese modelo para esa marca.";
+            return;
+        }
+
+        await ModeloService.Guardar(Modelo);
+        Navigation.NavigateTo("/Modelos/Index");
+    }
+}

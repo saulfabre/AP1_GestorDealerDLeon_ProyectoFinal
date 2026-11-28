@@ -1,0 +1,177 @@
+@page "/Vehiculos/Detalle/{VehiculoId:int}"
+
+@rendermode InteractiveServer
+
+@inject VehiculosServices VehiculoService
+
+<PageTitle>Detalle del vehiculo</PageTitle>
+
+<div class="container-fluid px-3 px-lg-5 py-4">
+    @if (!string.IsNullOrWhiteSpace(Mensaje))
+    {
+        <div class="alert alert-danger" role="alert">@Mensaje</div>
+    }
+    else if (Vehiculo is null)
+    {
+        <div class="alert alert-info" role="status">Cargando detalle del vehiculo...</div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h1 class="h3 mb-0">Detalle del vehiculo</h1>
+            </div>
+
+            <div class="card-body d-flex flex-column gap-4">
+                <section aria-labelledby="datos-generales">
+                    <h2 id="datos-generales" class="h5 mb-3">Datos generales</h2>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-3">
+                            <label class="form-label">Vehiculo ID</label>
+                            <input class="form-control" 
+                                    value="@Vehiculo.VehiculoId" 
+                                    readonly />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Marca</label>
+                            <input class="form-control" 
+                                    value="@(Vehiculo.Modelo?.Marca ?? "Sin marca")" 
+                                    readonly />
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <label class="form-label">Modelo</label>
+                            <input class="form-control" 
+                                    value="@(Vehiculo.Modelo?.Nombre ?? "Sin modelo")" 
+                                    readonly />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card" aria-labelledby="detalles-vehiculo">
+                    <div class="card-header py-2">
+                        <h2 id="detalles-vehiculo" class="h5 mb-0">Detalles del vehiculo</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Año</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Ano" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Matricula</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Matricula" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Estado</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Estado" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Color</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Color" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Precio</label>
+                                <input class="form-control" 
+                                        value="@($"RD$ {Vehiculo.Precio:N2}")" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Kilometraje</label>
+                                <input class="form-control" 
+                                        value="@($"{Vehiculo.Kilometraje:N0} km")" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Tipo</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Tipo" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Combustible</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Combustible" 
+                                        readonly />
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label">Transmisión</label>
+                                <input class="form-control" 
+                                        value="@Vehiculo.Transmision" 
+                                        readonly />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Fotografía</label>
+                                @if (!string.IsNullOrWhiteSpace(Vehiculo.Foto))
+                                {
+                                    <div class="ratio ratio-16x9">
+                                        <img src="@Vehiculo.Foto" 
+                                            alt="@($"{Vehiculo.Ano} {Vehiculo.Modelo?.Marca} {Vehiculo.Modelo?.Nombre}")" 
+                                            class="w-100 h-100 object-fit-cover rounded" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="border rounded bg-light p-4 text-center text-secondary">
+                                        <i class="bi bi-car-front fs-1" aria-hidden="true"></i>
+                                        <p class="mb-0">No hay fotografía disponible.</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="card-footer d-flex justify-content-center flex-wrap gap-2 py-3">
+                <a href="/Vehiculos/Catalogo" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al catálogo
+                </a>
+                <a href="@($"/Vehiculos/Edit/{Vehiculo.VehiculoId}")" class="btn btn-primary">
+                    Editar vehículo
+                </a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int VehiculoId { get; set; }
+
+    private Vehiculos? Vehiculo { get; set; }
+    private string? Mensaje { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var resultado = await VehiculoService.GetList(v => v.VehiculoId == VehiculoId);
+        if (resultado.IsSuccess)
+        {
+            Vehiculo = resultado.Value.FirstOrDefault();
+            if (Vehiculo is null)
+            {
+                Mensaje = "No se encontra el vehículo solicitado.";
+            }
+        }
+        else
+        {
+            Mensaje = resultado.Error.Description;
+        }
+    }
+
+    private static string EstadoClase(string estado) => estado switch
+    {
+        "Disponible" => "text-bg-success",
+        "Reservado" => "text-bg-warning",
+        "Inactivo" => "text-bg-secondary",
+        "Vendido" => "text-bg-primary",
+        _ => "text-bg-dark"
+    };
+}
