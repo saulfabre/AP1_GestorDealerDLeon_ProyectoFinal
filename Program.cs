@@ -11,6 +11,7 @@ builder.Services.AddScoped<VehiculosServices>();
 builder.Services.AddScoped<ModelosServices>();
 builder.Services.AddScoped<ProveedoresServices>();
 builder.Services.AddScoped<RepuestosServices>();
+builder.Services.AddScoped<ComprasRepuestosServices>();
 
 builder.Services.AddDbContextFactory<Contexto>(
     o => o.UseSqlServer(

@@ -8,6 +8,12 @@ public class Contexto : DbContext
     {
     }
 
+    public DbSet<Vehiculos> Vehiculos { get; set; }
+    public DbSet<Proveedores> Proveedores { get; set; }
+    public DbSet<Repuestos> Repuestos { get; set; }
+    public DbSet<ComprasRepuestos> ComprasRepuestos { get; set; }
+    public DbSet<ComprasRepuestosDetalles> ComprasRepuestosDetalles { get; set; }
+
     public DbSet<Models.Modelos> Modelos => Set<Models.Modelos>();
     public DbSet<Models.Vehiculos> Vehiculos => Set<Models.Vehiculos>();
     public DbSet<Models.Proveedores> Proveedores => Set<Models.Proveedores>();
