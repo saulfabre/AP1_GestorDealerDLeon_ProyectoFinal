@@ -10,7 +10,7 @@
     {
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
-            <h2 id="catalogo-titulo" class="h4 mb-0">CatÃ¡logo de vehÃ­culos disponibles</h2>
+            <h2 id="catalogo-titulo" class="h4 mb-0">Catalogo de vehiculos disponibles</h2>
         </div>
         <div class="card-body">
             <div class="d-flex flex-wrap gap-3 align-items-end">
@@ -45,7 +45,7 @@
                     </select>
                 </div>
                 <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
-                    <label for="catalogo-precio" class="form-label fw-semibold">Precio mÃ¡ximo</label>
+                    <label for="catalogo-precio" class="form-label fw-semibold">Precio máximo</label>
                     <select id="catalogo-precio" class="form-select" @bind="PrecioMaximo">
                         <option value="">Cualquier precio</option>
                         @foreach (var precio in PreciosDisponibles)
@@ -65,7 +65,7 @@
                     </select>
                 </div>
                 <div class="d-flex flex-column flex-fill" style="min-width: 12rem;">
-                    <label for="catalogo-transmision" class="form-label fw-semibold">TransmisiÃ³n</label>
+                    <label for="catalogo-transmision" class="form-label fw-semibold">Transmisiónn</label>
                     <select id="catalogo-transmision" class="form-select" @bind="Transmision">
                         <option value="">Todas</option>
                         @foreach (var transmision in TransmisionesDisponibles)
@@ -103,11 +103,11 @@
     }
     else if (Vehiculos.Count == 0)
     {
-        <div class="alert alert-info">No hay vehÃ­culos disponibles que coincidan con los filtros.</div>
+        <div class="alert alert-info">No hay vehículos disponibles que coincidan con los filtros.</div>
     }
     else
     {
-        <p class="text-muted">Mostrando @Vehiculos.Count vehÃ­culo(s) disponible(s).</p>
+        <p class="text-muted">Mostrando @Vehiculos.Count vehículo(s) disponible(s).</p>
     }
 
     <div class="row g-4">

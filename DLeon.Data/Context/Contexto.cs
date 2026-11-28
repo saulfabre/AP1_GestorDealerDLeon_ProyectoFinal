@@ -10,6 +10,8 @@ public class Contexto : DbContext
 
     public DbSet<Models.Modelos> Modelos => Set<Models.Modelos>();
     public DbSet<Models.Vehiculos> Vehiculos => Set<Models.Vehiculos>();
+    public DbSet<Models.Proveedores> Proveedores => Set<Models.Proveedores>();
+    public DbSet<Models.Repuestos> Repuestos => Set<Models.Repuestos>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +27,10 @@ public class Contexto : DbContext
 
         modelBuilder.Entity<Models.Vehiculos>()
             .Property(v => v.Precio)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Models.Repuestos>()
+            .Property(r => r.PrecioVenta)
             .HasPrecision(18, 2);
 
         modelBuilder.Entity<Models.Vehiculos>()
